@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gift Basket 🎁</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .modal-content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .media-container {
+      max-width: 45%;
+      text-align: center;
+    }
+    .media-container img,
+    .media-container video {
+      width: 100%;
+      max-height: 300px;
+      object-fit: contain;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    .media-container figcaption {
+      margin-top: 8px;
+      font-size: 0.95em;
+      color: #444;
+    }
+    .modal-content p {
+      flex-basis: 100%;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Happy 4 Years, My Love 💖</h1>
+  <p>For Our Anniversary I've Collected Some of Our Adventures From The Past 4 Years To Look at and Gathered Them All in This Gift Basket.</p>
+  <div class="container">
+    <img src="icons/basket.png" alt="Basket" id="basket" />
+    <div class="items" id="items">
+      <!-- Message Icon -->
+      <img src="icons/heart.png" class="item" data-type="message" data-message="I love you FOUR-EVAH WAHAHAHAHA 💘" />
+
+      <!-- Single Image -->
+      <img src="icons/camera.png" class="item" data-type="mixed" data-media='[{"src":"images/karaoke.png", "caption":"Photo Booth!"}, {"src":"videos/Karaoke.mp4", "caption":"From Our Post Karaoke Side Quest"}]' />
+
+      <!-- Image + Video -->
+      <img src="icons/campfire.png" class="item" data-type="image" data-media='[{"src":"images/marshmallows.jpg", "caption":"Melbourne Winter Festivals With You to Keep Me Warm"}]' />
+
+      <!-- Video Only -->
+      <img src="icons/facemask.png" class="item" data-type="video" data-media='[{"src":"videos/melb_trip.mp4", "caption":"Flashback to Whatever This Was"}]' />
+
+      <!-- Multiple Images -->
+      <img src="icons/graduation.png" class="item" data-type="image" data-media='[{"src":"images/suitNtieP1.png", "caption":"Us 4 Years Ago"}, {"src":"images/suitNtieP2.png", "caption":"Us a few Weeks Ago"}]' />
+
+      <!-- Single Image -->
+      <img src="icons/tennis.png" class="item" data-type="image" data-media='[{"src":"images/tennis_photo.jpg", "caption":"Sneaky AO Date"}]' />
+    </div>
+  </div>
+
+  <!-- Image/Video Modal -->
+  <div class="modal" id="imageModal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+    </div>
+  </div>
+
+  <audio id="basketSound" src="sounds/basket sound.mp3" preload="auto"></audio>
+  <script>
+    const basket = document.getElementById("basket");
+    const items = document.getElementById("items");
+    const basketSound = document.getElementById("basketSound");
+    const imageModal = document.getElementById("imageModal");
+    const modalContent = imageModal.querySelector(".modal-content");
+
+    basket.addEventListener("click", () => {
+      basket.classList.add("clicked");
+      basketSound.play();
+      items.style.display = "flex";
+      setTimeout(() => basket.classList.remove("clicked"), 600);
+    });
+
+    document.querySelectorAll(".item").forEach(item => {
+      item.addEventListener("click", () => {
+        const type = item.getAttribute("data-type");
+        const media = item.getAttribute("data-media");
+        const message = item.getAttribute("data-message");
+
+        modalContent.innerHTML = `<span class="close">&times;</span>`;
+
+        if (type === "message") {
+          const msg = document.createElement("p");
+          msg.textContent = message;
+          msg.style.fontSize = "1.5em";
+          msg.style.color = "#d14d72";
+          msg.style.textAlign = "center";
+          modalContent.appendChild(msg);
+          imageModal.style.display = "flex";
+
+        } else if (type === "image" || type === "mixed" || type === "video") {
+          const files = JSON.parse(media);
+
+          files.forEach(file => {
+            const figure = document.createElement("figure");
+            figure.className = "media-container";
+
+            if (file.src.endsWith(".mp4")) {
+              const vid = document.createElement("video");
+              vid.src = file.src;
+              vid.controls = true;
+              figure.appendChild(vid);
+              vid.play();
+            } else {
+              const img = document.createElement("img");
+              img.src = file.src;
+              figure.appendChild(img);
+            }
+
+            if (file.caption) {
+              const caption = document.createElement("figcaption");
+              caption.textContent = file.caption;
+              figure.appendChild(caption);
+            }
+
+            modalContent.appendChild(figure);
+          });
+
+          imageModal.style.display = "flex";
+        }
+
+        document.querySelectorAll(".close").forEach(btn => {
+          btn.onclick = () => {
+            imageModal.style.display = "none";
+            modalContent.querySelectorAll("video").forEach(vid => {
+              vid.pause();
+              vid.currentTime = 0;
+            });
+          };
+        });
+      });
+    });
+  </script>
+</body>
+</html>
